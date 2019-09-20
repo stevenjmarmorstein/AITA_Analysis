@@ -1,5 +1,10 @@
 #! usr/bin/env python3
 
+# Author: Steven Marmorstein
+# Uses the PRAW API to get the top 1000 AITA posts and label them accordingly
+# before writing the data to a file called data.json which is composed of a
+# dictionary of three lists : title, body, and label where the ith entry corresponds
+# to the ith title, body, and label annotated.
 import praw
 import pandas as pd
 import datetime as dt
