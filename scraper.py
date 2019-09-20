@@ -42,6 +42,8 @@ def main():
             posts_dict["body"].append(submission.selftext)
             posts_dict["label"].append(label)
             cnt_posts_labelled += 1
+
+    # Writing the data to a file:
     with open("data.json", "w+") as outfile:
         json.dump(posts_dict, outfile)
 

@@ -24,6 +24,7 @@ class Classifier(object):
         all_words_freqdist = FreqDist(w for w in all_words)
         self.word_features = all_words_freqdist.most_common(1000)
         print(self.word_features, "\n\n\n\n\n\n")
+        print(all_words_freqdist)
 
         data_triples = []
         train_set = []
@@ -66,6 +67,7 @@ class Classifier(object):
         json_string = f.read()
         dict = json.loads(json_string)
         return dict
+
 
 if __name__ == "__main__":
     Classifier()

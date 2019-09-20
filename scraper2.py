@@ -26,9 +26,9 @@ def main(*args):
 
 def annotator():
     """
-    Takes a list of submission ids and writes a JSON file with a dictionary
-    containing three lists: title, body, and label where the ith entry corresponds
-    to the ith title, body, and label annotated.
+    Writes a JSON file with a dictionary containing three lists: title, body,
+    and label where the ith entry corresponds to the ith title, body, and label
+    annotated.
     """
 
     reddit = get_praw_reddit()
@@ -43,6 +43,7 @@ def annotator():
             posts_dict["body"].append(subm.selftext)
             posts_dict["label"].append(label)
             cnt_posts_labelled += 1
+            print(cnt_posts_labelled)
 
     # Writing the data to a file:
     filename = "big_data.json"
@@ -77,6 +78,8 @@ def get_label(submission):
                     return 'ESH'
                 elif pos_judgement.upper() == 'NAH':
                     return 'NAH'
+                elif top_comments[i].body[0:4].upper() == "INFO":
+                    return 'INFO'
                 elif "Your post has been removed." in top_comments[i].body:
                     return None
                 else:
@@ -85,8 +88,8 @@ def get_label(submission):
                     # Print the title:
                     print(submission.title, '\n')
                     print(top_comments[i].body, '\n')
+                    print(top_comments[i].score, '\n')
                     label = input("1. NTA\n2. YTA \n3. ESH\n4. NAH\n5. INFO\n")
-                    label = input()
 
                     i = i+1
                     next_top_comment = top_comments[i]
@@ -140,6 +143,7 @@ def get_submissions(reddit):
     subm_ids = get_subm_ids()
     submissions = []
     for subm_id in subm_ids:
+
         submission = reddit.submission(subm_id)
         # Confirms that the submission request was successful:
         try:
@@ -148,6 +152,7 @@ def get_submissions(reddit):
                 continue
             else:
                 submissions.append(submission)
+                print(len(submissions))
         except:
             continue
 
@@ -163,7 +168,7 @@ def get_subm_ids():
     step_size = 7
 
     # Initializing data:
-    before_date = datetime.today()
+    before_date = datetime.today() - timedelta(days=1)
     after_date = before_date - timedelta(days=step_size)
     data = get_data(before_date, after_date)
 
