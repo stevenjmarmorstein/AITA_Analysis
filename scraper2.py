@@ -9,20 +9,8 @@ from datetime import datetime, timedelta
 import praw
 
 def main(*args):
-    # Gets a list of all submission ids that will be mined for data:
     annotator()
-    # print(data[sub_idx])
-    # for key in data[sub_idx].keys():
-    #     print(key, data[sub_idx][key])
-    # print(data[sub_idx]['score'])
-    # print(data[sub_idx]['title'])
-    # print(data[sub_idx]['author_flair_text'])
-    # print(data[sub_idx]['selftext'])
-    # reddit = get_praw_reddit()
-    # subm = praw.models.Submission(reddit, id=data[sub_idx]['id'], url=None, _data=None)
-    # print(subm.title)
-    # print(subm.score)
-    # print(len(data))
+
 
 def annotator():
     """
@@ -110,6 +98,10 @@ def get_label(submission):
 
 
 def get_label_from_flair(flair):
+    """
+    Takes the flair text as a string and returns an appropriate label string.
+    """
+
     if(flair == "Not the A-hole"):
         return "NTA"
     elif(flair == "Asshole"):
@@ -215,6 +207,7 @@ def get_data(before_date, after_date):
         return data['data']
     except:
         return []
+
 
 def get_praw_reddit():
     """

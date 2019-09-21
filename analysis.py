@@ -46,6 +46,11 @@ class Classifier(object):
 
 
     def extract_features(self, trip):
+        """
+        Returns a dictionary with string keys and boolean values that indicate
+        whether or not a word is found in the title+body of a post. 
+        """
+
         title = trip[0]
         body = trip[1]
         text = title + " " + body
