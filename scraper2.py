@@ -23,7 +23,6 @@ def annotator():
     submissions = get_submissions(reddit)
     posts_dict = { "title":[], "body":[], "label":[]}
     cnt_posts_labelled = 0
-    # TODO: Batch the submissions so the annotator isn't waiting.
     for subm in submissions:
         label = get_label(subm)
         if (label != None):
@@ -42,11 +41,15 @@ def annotator():
 
 
 def get_label(submission):
+    """
+    Given a PRAW submission object, returns the label associated with that
+    submission. Returns None if the post is trash.
+    """
     label = get_label_from_flair(submission.link_flair_text)
     if (label != None):
         return label
     else:
-    # Getting the comments for this submission
+        # Getting the comments for this submission
         top_comments = get_top_comments(submission)
 
         i = 0
@@ -56,7 +59,7 @@ def get_label(submission):
         if(label != ''):
             label = 'r'
             while(label == 'r'):
-
+                # The first three characters contain a possible judgment:
                 pos_judgement = top_comments[i].body[0:3].upper()
                 if pos_judgement.upper() == 'NTA':
                     return 'NTA'
@@ -71,9 +74,8 @@ def get_label(submission):
                 elif "Your post has been removed." in top_comments[i].body:
                     return None
                 else:
-                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                     # Case where user has to answer:
-                    # Print the title:
+                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                     print(submission.title, '\n')
                     print(top_comments[i].body, '\n')
                     print(top_comments[i].score, '\n')
@@ -101,7 +103,6 @@ def get_label_from_flair(flair):
     """
     Takes the flair text as a string and returns an appropriate label string.
     """
-
     if(flair == "Not the A-hole"):
         return "NTA"
     elif(flair == "Asshole"):
@@ -143,6 +144,7 @@ def get_submissions(reddit):
             if 'update' in submission.title.lower() or 'meta' in submission.title.lower():
                 continue
             else:
+                # Adding the PRAW submission to the list
                 submissions.append(submission)
                 print(len(submissions))
         except:
@@ -155,8 +157,8 @@ def get_subm_ids():
     Returns a list of submission ids as strings, accumulating as many posts as
     possible from the AITA subreddit.
     """
-
-    # Size of the intervals that are queried:
+    # Size of the intervals that are queried (size is too large if there are
+    # more than 1000 results in that time period):
     step_size = 7
 
     # Initializing data:
@@ -188,7 +190,6 @@ def get_data(before_date, after_date):
     a collective and not an anomalous first or only comment and that low-effort
     posts are weeded out. Returns an empty list if there is no data.
     """
-
     # Name of the subreddit to scrape:
     sub = "AmITheAsshole"
     # Only returns posts with scores >= the limit
