@@ -6,7 +6,7 @@ import json
 import random
 
 
-class Classifier(object):
+class Analysis(object):
 
     def __init__(self, *args):
         posts_dict = self.get_data()
@@ -27,17 +27,24 @@ class Classifier(object):
         print(all_words_freqdist)
 
         data_triples = []
-        train_set = []
-        dev_test = []
+        # This dictionary will score the counts of each label:
+        counts = { "NAH":0, "ESH":0, "NTA":0, "YTA":0, "INFO":0 }
+        print(len(labels))
+
+        # Loop counts the number of posts with each label and makes a tuple of
+        # the text and its label:
+        data_triples = []
         for i in range(len(labels)):
+            counts[labels[i]] += 1
             if(labels[i] != "INFO"):
                 data_triples.append((titles[i], bodies[i], labels[i]))
+        print(counts)
         random.shuffle(data_triples)
         N = len(data_triples)
         feature_label_pairs = []
         for trip in data_triples:
             feature_label_pairs.append((self.extract_features(trip), trip[2]))
-        # print(len(feature_label_pairs))
+
         train_set = feature_label_pairs[:N//2]
         dev_set = feature_label_pairs[N//2:]
         classifier = NaiveBayesClassifier.train(train_set)
@@ -48,7 +55,7 @@ class Classifier(object):
     def extract_features(self, trip):
         """
         Returns a dictionary with string keys and boolean values that indicate
-        whether or not a word is found in the title+body of a post. 
+        whether or not a word is found in the title+body of a post.
         """
 
         title = trip[0]
@@ -68,7 +75,8 @@ class Classifier(object):
         and body. The data should be ordered so that the ith post in the collection
         corresponds to the ith title, body, and label.
         """
-        f = open("data.json", "r")
+        filename = "big_data.json"
+        f = open(filename, "r")
         json_string = f.read()
         dict = json.loads(json_string)
         return dict

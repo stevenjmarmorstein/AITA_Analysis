@@ -1,4 +1,5 @@
 # Author: Steven Marmorstein
+# TODO: Filter out posts where body is "removed" that weren't initially caught.
 
 import pandas as pd
 import requests
