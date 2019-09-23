@@ -3,6 +3,8 @@ import random
 
 import nltk
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import SGDClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -11,31 +13,32 @@ from sklearn.metrics import classification_report
 
 
 def main(*args):
-    pos_labels = ["NTA", "YTA", "NAH", "ESH", "INFO"]
+    pos_labels = ["NTA", "YTA", "NAH", "ESH"]
 
     raw_data = get_data()
     cleaned_inputs = clean_posts(raw_data['title'], raw_data['body'])
     labels = raw_data['label']
+
     # should remove INFO posts here
-    data_pairs = [(cleaned_inputs[i], labels[i]) for i in range(len(labels))]
+    data_pairs = [(cleaned_inputs[i], labels[i]) for i in range(len(labels)) if labels[i] != "INFO"]
+
     # Dividing the data 65/35 into train and test
     random.shuffle(data_pairs)
-    x_train = [data_pairs[i][0] for i in range(round(len(labels)*.65))]
-    y_train = [data_pairs[i][1] for i in range(round(len(labels)*.65))]
-    x_test = [data_pairs[i][0] for i in range((round(len(labels)*.65)), len(labels))]
-    y_test = [data_pairs[i][1] for i in range((round(len(labels)*.65)), len(labels))]
+    x_train = [data_pairs[i][0] for i in range(round(len(data_pairs)*.65))]
+    y_train = [data_pairs[i][1] for i in range(round(len(data_pairs)*.65))]
+    x_test = [data_pairs[i][0] for i in range((round(len(data_pairs)*.65)), len(data_pairs))]
+    y_test = [data_pairs[i][1] for i in range((round(len(data_pairs)*.65)), len(data_pairs))]
 
 
 
-    nb = Pipeline([('vect', CountVectorizer()),
-               ('tfidf', TfidfTransformer()),
-               ('clf', MultinomialNB()),
-              ])
+    logreg = Pipeline([('vect', CountVectorizer()),
+                ('tfidf', TfidfTransformer()),
+                ('clf', LogisticRegression(n_jobs=1, C=1e5)),
+               ])
 
-    nb.fit(x_train, y_train)
+    logreg.fit(x_train, y_train)
 
-    y_predicted = nb.predict(x_test)
-    print(y_predicted)
+    y_predicted = logreg.predict(x_test)
     print('accuracy %s' % accuracy_score(y_predicted, y_test))
     print(classification_report(y_test, y_predicted))
 
@@ -53,7 +56,8 @@ def clean_posts(titles, bodies):
     for i in range(len(titles)):
         point = (titles[i] + " " + bodies[i]).lower()
         point_words = nltk.word_tokenize(point)
-        # removing stop words:
+
+        # removing stop words and making the list of words into a single str:
         point_words = " ".join([word for word in point_words if word not in stopwords_set])
         posts.append(point_words)
 
